@@ -1,17 +1,20 @@
 (in-package :cl-user)
 (defpackage lack.middleware.batis
-  (:use :cl))
+  (:use :cl)
+  (:export :*lack-middleware-batis*))
 (in-package :lack.middleware.batis)
 
-(cl-syntax:use-syntax :annot)
-
-@export
 (defparameter *lack-middleware-batis*
-  (lambda (app connection-pool)
+  (lambda (app)
     (lambda (env)
-      (let ((session (batis:create-sql-session connection-pool)))
-        (setf (getf env :lack.batis) session)
-        (prog1
-            (funcall app env)
-          (batis:close-sql-session session))))))
-
+      (let ((connection (getf env :lack.db.connection)))
+        (if (not (null connection))
+            (let ((session (batis:create-sql-session (dbi-cp.proxy:dbi-connection connection))))
+              (setf (getf env :lack.db.session) session)
+              (handler-bind ((error (lambda ()
+                                      (batis:rollback session)
+                                      (batis:close-sql-session session))))
+                (prog1
+                   (funcall app env)
+                  (batis:close-sql-session session))))
+            (funcall app env))))))

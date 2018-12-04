@@ -1,6 +1,6 @@
 #|
   This file is a part of lack-middleware-batis project.
-  Copyright (c) 2017 tamura shingo (tamura.shingo@gmail.com)
+  Copyright (c) 2017-2018 tamura shingo (tamura.shingo@gmail.com)
 |#
 
 #|
@@ -18,11 +18,8 @@
   :version "0.1"
   :author "tamura shingo"
   :license "MIT"
-  :depends-on (:cl-syntax
-               :lack-request
-               :lack-response
-               :lack-util
-               :cl-batis)
+  :depends-on (:cl-batis
+               :cl-dbi-connection-pool)
   :components ((:module "src"
                 :components
                 ((:file "lack-middleware-batis"))))
